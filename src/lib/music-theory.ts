@@ -46,6 +46,7 @@ export interface ChordDefinition {
   type: ChordType;
   notes: Note[];
   degrees: string[]; // コードルートからの度数
+  role: string; // ダイアトニック機能（Ⅰ, Ⅱm, etc.）
 }
 
 // コード構成音を計算
@@ -82,21 +83,21 @@ function getChordNotes(root: Note, type: ChordType): { notes: Note[]; degrees: s
 // Gメジャーダイアトニックコード定義
 export const CHORDS: ChordDefinition[] = [
   // トライアド
-  { name: 'G', root: 'G', type: 'major', ...getChordNotes('G', 'major') },
-  { name: 'Am', root: 'A', type: 'minor', ...getChordNotes('A', 'minor') },
-  { name: 'Bm', root: 'B', type: 'minor', ...getChordNotes('B', 'minor') },
-  { name: 'C', root: 'C', type: 'major', ...getChordNotes('C', 'major') },
-  { name: 'D', root: 'D', type: 'major', ...getChordNotes('D', 'major') },
-  { name: 'Em', root: 'E', type: 'minor', ...getChordNotes('E', 'minor') },
-  { name: 'F#m♭5', root: 'F#', type: 'dim', ...getChordNotes('F#', 'dim') },
+  { name: 'G', root: 'G', type: 'major', role: 'Ⅰ', ...getChordNotes('G', 'major') },
+  { name: 'Am', root: 'A', type: 'minor', role: 'Ⅱm', ...getChordNotes('A', 'minor') },
+  { name: 'Bm', root: 'B', type: 'minor', role: 'Ⅲm', ...getChordNotes('B', 'minor') },
+  { name: 'C', root: 'C', type: 'major', role: 'Ⅳ', ...getChordNotes('C', 'major') },
+  { name: 'D', root: 'D', type: 'major', role: 'Ⅴ', ...getChordNotes('D', 'major') },
+  { name: 'Em', root: 'E', type: 'minor', role: 'Ⅵm', ...getChordNotes('E', 'minor') },
+  { name: 'F#m♭5', root: 'F#', type: 'dim', role: 'Ⅶm♭5', ...getChordNotes('F#', 'dim') },
   // セブンス
-  { name: 'Gmaj7', root: 'G', type: 'maj7', ...getChordNotes('G', 'maj7') },
-  { name: 'Am7', root: 'A', type: 'min7', ...getChordNotes('A', 'min7') },
-  { name: 'Bm7', root: 'B', type: 'min7', ...getChordNotes('B', 'min7') },
-  { name: 'Cmaj7', root: 'C', type: 'maj7', ...getChordNotes('C', 'maj7') },
-  { name: 'D7', root: 'D', type: '7', ...getChordNotes('D', '7') },
-  { name: 'Em7', root: 'E', type: 'min7', ...getChordNotes('E', 'min7') },
-  { name: 'F#m7♭5', root: 'F#', type: 'min7b5', ...getChordNotes('F#', 'min7b5') },
+  { name: 'Gmaj7', root: 'G', type: 'maj7', role: 'Ⅰmaj7', ...getChordNotes('G', 'maj7') },
+  { name: 'Am7', root: 'A', type: 'min7', role: 'Ⅱm7', ...getChordNotes('A', 'min7') },
+  { name: 'Bm7', root: 'B', type: 'min7', role: 'Ⅲm7', ...getChordNotes('B', 'min7') },
+  { name: 'Cmaj7', root: 'C', type: 'maj7', role: 'Ⅳmaj7', ...getChordNotes('C', 'maj7') },
+  { name: 'D7', root: 'D', type: '7', role: 'Ⅴ7', ...getChordNotes('D', '7') },
+  { name: 'Em7', root: 'E', type: 'min7', role: 'Ⅵm7', ...getChordNotes('E', 'min7') },
+  { name: 'F#m7♭5', root: 'F#', type: 'min7b5', role: 'Ⅶm7♭5', ...getChordNotes('F#', 'min7b5') },
 ];
 
 // トライアドとセブンスを分離

@@ -3,75 +3,122 @@
 import { useState } from 'react';
 import { Fretboard } from '@/components/Fretboard';
 import { ChordSelector } from '@/components/ChordSelector';
+import { Switch } from '@/components/ui/switch';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import {
   TRIAD_CHORDS,
   ChordDefinition,
-  G_MAJOR_WITH_BLUE_TEXT,
+  G_MAJOR_SCALE_TEXT,
   formatNotes,
 } from '@/lib/music-theory';
 
 export default function Home() {
   const [selectedChord, setSelectedChord] = useState<ChordDefinition>(TRIAD_CHORDS[0]);
+  const [showBlueNotes, setShowBlueNotes] = useState(true);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* ヘッダー */}
-        <header className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900">
+    <div className="min-h-screen bg-muted/40 p-4 md:p-8">
+      <div className="mx-auto max-w-6xl space-y-6">
+        {/* Header */}
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight">
             Guitar Fretboard Visualizer
           </h1>
-          <p className="mt-2 text-gray-600">Gメジャーキー - スケール & コードトーン</p>
-        </header>
-
-        {/* コード選択 */}
-        <div className="bg-white rounded-lg shadow p-4">
-          <ChordSelector
-            selectedChord={selectedChord}
-            onChordSelect={setSelectedChord}
-          />
+          <p className="text-muted-foreground">
+            G Major Key - Scale & Chord Tone Visualization
+          </p>
         </div>
 
-        {/* 凡例 */}
-        <div className="bg-white rounded-lg shadow p-4">
-          <div className="text-sm font-medium text-gray-700 mb-2">凡例</div>
-          <div className="flex flex-wrap gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-blue-500" />
-              <span>スケールトーン</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-orange-500" />
-              <span>ブルーノート (♭3, ♭5, ♭7)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-emerald-500" />
-              <span>コードトーン</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-blue-400 opacity-40" />
-              <span>スケールトーン（薄）</span>
-            </div>
-          </div>
+        {/* Controls Row */}
+        <div className="grid gap-4 md:grid-cols-[1fr_auto]">
+          {/* Chord Selector */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base">Select Chord</CardTitle>
+              <CardDescription>G Major Diatonic Chords</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ChordSelector
+                selectedChord={selectedChord}
+                onChordSelect={setSelectedChord}
+              />
+            </CardContent>
+          </Card>
+
+          {/* Legend */}
+          <Card className="md:w-64">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base">Legend</CardTitle>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    id="blue-notes"
+                    checked={showBlueNotes}
+                    onCheckedChange={setShowBlueNotes}
+                  />
+                  <label htmlFor="blue-notes" className="text-xs text-muted-foreground cursor-pointer">
+                    Blue Notes
+                  </label>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full bg-indigo-500" />
+                  <div className="w-4 h-4 rounded-full bg-indigo-400/40" />
+                  <span className="text-muted-foreground">Scale Tone</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 rounded-full bg-emerald-500" />
+                  <span className="text-muted-foreground">Chord Tone</span>
+                </div>
+                {showBlueNotes && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 rounded-full bg-amber-600/80" />
+                    <span className="text-muted-foreground">Blue Notes</span>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* 上段: Gメジャースケール指板 */}
-        <div className="bg-white rounded-lg shadow p-4">
-          <Fretboard
-            title="Gメジャースケール + ブルーノート"
-            subtitle={`構成音: ${G_MAJOR_WITH_BLUE_TEXT}`}
-            mode="scale"
-          />
-        </div>
+        {/* Fretboards */}
+        <div className="grid gap-4">
+          {/* G Major Scale */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle>G Major Scale</CardTitle>
+              <CardDescription>Notes: {G_MAJOR_SCALE_TEXT}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Fretboard
+                mode="scale"
+                showBlueNotes={showBlueNotes}
+              />
+            </CardContent>
+          </Card>
 
-        {/* 下段: 選択コードの指板 */}
-        <div className="bg-white rounded-lg shadow p-4">
-          <Fretboard
-            title={`${selectedChord.name} コードトーン`}
-            subtitle={`構成音: ${formatNotes(selectedChord.notes)}`}
-            mode="chord"
-            chord={selectedChord}
-          />
+          {/* Chord Tones */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle>{selectedChord.name} Chord Tones</CardTitle>
+              <CardDescription>Notes: {formatNotes(selectedChord.notes)}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Fretboard
+                mode="chord"
+                chord={selectedChord}
+              />
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

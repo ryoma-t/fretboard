@@ -8,39 +8,77 @@ interface ChordSelectorProps {
   onChordSelect: (chord: ChordDefinition) => void;
 }
 
+const DEGREE_LABELS = ['Ⅰ', 'Ⅱm', 'Ⅲm', 'Ⅳ', 'Ⅴ', 'Ⅵm', 'Ⅶm♭5'];
+
+// コード機能: T=Tonic, SD=Subdominant, D=Dominant
+type ChordFunction = 'T' | 'SD' | 'D';
+const CHORD_FUNCTIONS: ChordFunction[] = ['T', 'SD', 'T', 'SD', 'D', 'T', 'D'];
+
+const FUNCTION_COLORS: Record<ChordFunction, string> = {
+  'T': 'bg-stone-100 hover:bg-stone-200',      // Tonic: 薄い（安定）
+  'SD': 'bg-stone-200 hover:bg-stone-300',     // Subdominant: 中間
+  'D': 'bg-stone-300 hover:bg-stone-400',      // Dominant: 濃い（緊張）
+};
+
+const FUNCTION_LABELS: Record<ChordFunction, string> = {
+  'T': 'T',
+  'SD': 'SD',
+  'D': 'D',
+};
+
 export function ChordSelector({ selectedChord, onChordSelect }: ChordSelectorProps) {
   return (
     <div className="space-y-3">
-      <div className="text-sm font-medium text-gray-700">コードを選択（Gメジャーキー）</div>
-
-      {/* トライアド */}
-      <div className="flex flex-wrap gap-2">
-        {TRIAD_CHORDS.map((chord) => (
-          <Button
-            key={chord.name}
-            variant={selectedChord.name === chord.name ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => onChordSelect(chord)}
-            className="min-w-[60px]"
-          >
-            {chord.name}
-          </Button>
-        ))}
+      <div className="flex items-center justify-end gap-3 text-xs text-muted-foreground">
+        <span className="flex items-center gap-1">
+          <span className="w-2.5 h-2.5 rounded bg-muted" />T
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="w-2.5 h-2.5 rounded bg-muted-foreground/30" />SD
+        </span>
+        <span className="flex items-center gap-1">
+          <span className="w-2.5 h-2.5 rounded bg-muted-foreground/50" />D
+        </span>
       </div>
 
-      {/* セブンス */}
-      <div className="flex flex-wrap gap-2">
-        {SEVENTH_CHORDS.map((chord) => (
-          <Button
-            key={chord.name}
-            variant={selectedChord.name === chord.name ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => onChordSelect(chord)}
-            className="min-w-[80px]"
-          >
-            {chord.name}
-          </Button>
-        ))}
+      <div className="overflow-x-auto">
+        <div className="grid grid-cols-[auto_repeat(7,1fr)] gap-2 min-w-[540px]">
+          {/* Header row: degrees */}
+          <div /> {/* empty cell */}
+          {DEGREE_LABELS.map((label) => (
+            <div key={label} className="text-center text-xs font-medium text-muted-foreground pb-1">
+              {label}
+            </div>
+          ))}
+
+          {/* Triad row */}
+          <div className="text-xs font-medium text-muted-foreground flex items-center">Triad</div>
+          {TRIAD_CHORDS.map((chord, i) => (
+            <Button
+              key={chord.name}
+              variant={selectedChord.name === chord.name ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => onChordSelect(chord)}
+              className={`w-full ${selectedChord.name !== chord.name ? FUNCTION_COLORS[CHORD_FUNCTIONS[i]] : ''}`}
+            >
+              {chord.name}
+            </Button>
+          ))}
+
+          {/* 7th row */}
+          <div className="text-xs font-medium text-muted-foreground flex items-center">7th</div>
+          {SEVENTH_CHORDS.map((chord, i) => (
+            <Button
+              key={chord.name}
+              variant={selectedChord.name === chord.name ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => onChordSelect(chord)}
+              className={`w-full ${selectedChord.name !== chord.name ? FUNCTION_COLORS[CHORD_FUNCTIONS[i]] : ''}`}
+            >
+              {chord.name}
+            </Button>
+          ))}
+        </div>
       </div>
     </div>
   );
