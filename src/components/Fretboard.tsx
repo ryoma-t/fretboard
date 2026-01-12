@@ -91,8 +91,8 @@ export function Fretboard({ mode, chord, showBlueNotes = true }: FretboardProps)
   return (
     <div className="w-full">
       {/* Fretboard */}
-      <div className="overflow-x-auto">
-        <div className="min-w-[800px]">
+      <div className="overflow-x-auto -mx-2 px-2">
+        <div className="min-w-[700px]">
           {/* Fret numbers */}
           <div className="flex mb-1">
             <div className="w-8 shrink-0" /> {/* String name space */}

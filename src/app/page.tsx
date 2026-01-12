@@ -23,20 +23,20 @@ export default function Home() {
   const [showBlueNotes, setShowBlueNotes] = useState(true);
 
   return (
-    <div className="min-h-screen bg-muted/40 p-4 md:p-8">
-      <div className="mx-auto max-w-6xl space-y-6">
+    <div className="min-h-screen bg-muted/40 p-4 lg:p-8">
+      <div className="mx-auto max-w-6xl space-y-4 lg:space-y-6">
         {/* Header */}
         <div className="space-y-1">
-          <h1 className="text-2xl font-bold tracking-tight">
+          <h1 className="text-xl lg:text-2xl font-bold tracking-tight">
             Guitar Fretboard Visualizer
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             G Major Key - Scale & Chord Tone Visualization
           </p>
         </div>
 
         {/* Controls Row */}
-        <div className="grid gap-4 md:grid-cols-[1fr_auto]">
+        <div className="grid gap-4 lg:grid-cols-[1fr_auto]">
           {/* Chord Selector */}
           <Card>
             <CardHeader className="pb-3">
@@ -52,7 +52,7 @@ export default function Home() {
           </Card>
 
           {/* Legend */}
-          <Card className="md:w-64">
+          <Card className="lg:w-56">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base">Legend</CardTitle>

@@ -41,8 +41,8 @@ export function ChordSelector({ selectedChord, onChordSelect }: ChordSelectorPro
         </span>
       </div>
 
-      <div className="overflow-x-auto">
-        <div className="grid grid-cols-[auto_repeat(7,1fr)] gap-2 min-w-[540px]">
+      <div className="overflow-x-auto -mx-2 px-2">
+        <div className="grid grid-cols-[auto_repeat(7,1fr)] gap-1.5 sm:gap-2 min-w-[480px]">
           {/* Header row: degrees */}
           <div /> {/* empty cell */}
           {DEGREE_LABELS.map((label) => (
