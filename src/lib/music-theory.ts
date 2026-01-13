@@ -1,8 +1,27 @@
-// 音名定義
+// Note definitions
 export const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'] as const;
 export type Note = typeof NOTES[number];
 
-// フラット表記のマッピング
+// All keys (for selection)
+export const ALL_KEYS: Note[] = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+// Display names for keys (with enharmonic alternatives)
+export const KEY_DISPLAY_NAMES: Record<Note, string> = {
+  'C': 'C',
+  'C#': 'C# / Db',
+  'D': 'D',
+  'D#': 'D# / Eb',
+  'E': 'E',
+  'F': 'F',
+  'F#': 'F# / Gb',
+  'G': 'G',
+  'G#': 'G# / Ab',
+  'A': 'A',
+  'A#': 'A# / Bb',
+  'B': 'B',
+};
+
+// Flat notation mapping
 export const FLAT_NOTES: Record<string, string> = {
   'C#': 'Db',
   'D#': 'Eb',
@@ -11,138 +30,178 @@ export const FLAT_NOTES: Record<string, string> = {
   'A#': 'Bb',
 };
 
-// 標準チューニング（6弦から1弦）
+// Standard tuning (6th string to 1st string)
 export const STANDARD_TUNING: Note[] = ['E', 'A', 'D', 'G', 'B', 'E'];
 
-// Gメジャースケール
-export const G_MAJOR_SCALE: Note[] = ['G', 'A', 'B', 'C', 'D', 'E', 'F#'];
+// Major scale intervals (semitones from root)
+const MAJOR_SCALE_INTERVALS = [0, 2, 4, 5, 7, 9, 11];
 
-// ブルーノート（Gメジャー基準）
-export const BLUE_NOTES: Note[] = ['A#', 'C#', 'F']; // ♭3=Bb, ♭5=Db, ♭7=F
+// Blue note intervals (semitones from root): b3, b5, b7
+const BLUE_NOTE_INTERVALS = [3, 6, 10];
 
-// Gメジャースケール基準の度数表記
-export const G_MAJOR_DEGREES: Record<Note, string> = {
-  'C': '4',
-  'C#': '♭5',
-  'D': '5',
-  'D#': '♭6',
-  'E': '6',
-  'F': '♭7',
-  'F#': '7',
-  'G': 'R',
-  'G#': '♭2',
-  'A': '2',
-  'A#': '♭3',
-  'B': '3',
-};
+// Get major scale for a given key
+export function getMajorScale(key: Note): Note[] {
+  const keyIndex = NOTES.indexOf(key);
+  return MAJOR_SCALE_INTERVALS.map(interval => NOTES[(keyIndex + interval) % 12]);
+}
 
-// コードタイプ
+// Get blue notes for a given key
+export function getBlueNotes(key: Note): Note[] {
+  const keyIndex = NOTES.indexOf(key);
+  return BLUE_NOTE_INTERVALS.map(interval => NOTES[(keyIndex + interval) % 12]);
+}
+
+// Get degree label for a note relative to a key
+export function getDegreeLabel(note: Note, key: Note): string {
+  const keyIndex = NOTES.indexOf(key);
+  const noteIndex = NOTES.indexOf(note);
+  const interval = (noteIndex - keyIndex + 12) % 12;
+
+  const degreeMap: Record<number, string> = {
+    0: 'R',
+    1: '♭2',
+    2: '2',
+    3: '♭3',
+    4: '3',
+    5: '4',
+    6: '♭5',
+    7: '5',
+    8: '♭6',
+    9: '6',
+    10: '♭7',
+    11: '7',
+  };
+
+  return degreeMap[interval];
+}
+
+// Chord type
 export type ChordType = 'major' | 'minor' | 'dim' | 'maj7' | 'min7' | '7' | 'min7b5';
 
-// コード定義
+// Chord definition
 export interface ChordDefinition {
   name: string;
   root: Note;
   type: ChordType;
   notes: Note[];
-  degrees: string[]; // コードルートからの度数
-  role: string; // ダイアトニック機能（Ⅰ, Ⅱm, etc.）
+  degrees: string[]; // Degrees from chord root
+  role: string; // Diatonic function
 }
 
-// コード構成音を計算
+// Chord intervals and degree labels
+const CHORD_INTERVALS: Record<ChordType, number[]> = {
+  'major': [0, 4, 7],
+  'minor': [0, 3, 7],
+  'dim': [0, 3, 6],
+  'maj7': [0, 4, 7, 11],
+  'min7': [0, 3, 7, 10],
+  '7': [0, 4, 7, 10],
+  'min7b5': [0, 3, 6, 10],
+};
+
+const CHORD_DEGREE_LABELS: Record<ChordType, string[]> = {
+  'major': ['R', '3', '5'],
+  'minor': ['R', '♭3', '5'],
+  'dim': ['R', '♭3', '♭5'],
+  'maj7': ['R', '3', '5', '7'],
+  'min7': ['R', '♭3', '5', '♭7'],
+  '7': ['R', '3', '5', '♭7'],
+  'min7b5': ['R', '♭3', '♭5', '♭7'],
+};
+
+// Diatonic chord types for major scale
+const DIATONIC_TRIAD_TYPES: ChordType[] = ['major', 'minor', 'minor', 'major', 'major', 'minor', 'dim'];
+const DIATONIC_SEVENTH_TYPES: ChordType[] = ['maj7', 'min7', 'min7', 'maj7', '7', 'min7', 'min7b5'];
+const DIATONIC_ROLES = ['Ⅰ', 'Ⅱm', 'Ⅲm', 'Ⅳ', 'Ⅴ', 'Ⅵm', 'Ⅶm♭5'];
+const DIATONIC_SEVENTH_ROLES = ['Ⅰmaj7', 'Ⅱm7', 'Ⅲm7', 'Ⅳmaj7', 'Ⅴ7', 'Ⅵm7', 'Ⅶm7♭5'];
+
+// Get chord notes
 function getChordNotes(root: Note, type: ChordType): { notes: Note[]; degrees: string[] } {
   const rootIndex = NOTES.indexOf(root);
-
-  const intervals: Record<ChordType, number[]> = {
-    'major': [0, 4, 7],         // R, 3, 5
-    'minor': [0, 3, 7],         // R, ♭3, 5
-    'dim': [0, 3, 6],           // R, ♭3, ♭5
-    'maj7': [0, 4, 7, 11],      // R, 3, 5, 7
-    'min7': [0, 3, 7, 10],      // R, ♭3, 5, ♭7
-    '7': [0, 4, 7, 10],         // R, 3, 5, ♭7
-    'min7b5': [0, 3, 6, 10],    // R, ♭3, ♭5, ♭7
-  };
-
-  const degreeLabels: Record<ChordType, string[]> = {
-    'major': ['R', '3', '5'],
-    'minor': ['R', '♭3', '5'],
-    'dim': ['R', '♭3', '♭5'],
-    'maj7': ['R', '3', '5', '7'],
-    'min7': ['R', '♭3', '5', '♭7'],
-    '7': ['R', '3', '5', '♭7'],
-    'min7b5': ['R', '♭3', '♭5', '♭7'],
-  };
-
-  const chordIntervals = intervals[type];
-  const notes = chordIntervals.map(interval => NOTES[(rootIndex + interval) % 12]);
-  const degrees = degreeLabels[type];
-
+  const intervals = CHORD_INTERVALS[type];
+  const notes = intervals.map(interval => NOTES[(rootIndex + interval) % 12]);
+  const degrees = CHORD_DEGREE_LABELS[type];
   return { notes, degrees };
 }
 
-// Gメジャーダイアトニックコード定義
-export const CHORDS: ChordDefinition[] = [
-  // トライアド
-  { name: 'G', root: 'G', type: 'major', role: 'Ⅰ', ...getChordNotes('G', 'major') },
-  { name: 'Am', root: 'A', type: 'minor', role: 'Ⅱm', ...getChordNotes('A', 'minor') },
-  { name: 'Bm', root: 'B', type: 'minor', role: 'Ⅲm', ...getChordNotes('B', 'minor') },
-  { name: 'C', root: 'C', type: 'major', role: 'Ⅳ', ...getChordNotes('C', 'major') },
-  { name: 'D', root: 'D', type: 'major', role: 'Ⅴ', ...getChordNotes('D', 'major') },
-  { name: 'Em', root: 'E', type: 'minor', role: 'Ⅵm', ...getChordNotes('E', 'minor') },
-  { name: 'F#m♭5', root: 'F#', type: 'dim', role: 'Ⅶm♭5', ...getChordNotes('F#', 'dim') },
-  // セブンス
-  { name: 'Gmaj7', root: 'G', type: 'maj7', role: 'Ⅰmaj7', ...getChordNotes('G', 'maj7') },
-  { name: 'Am7', root: 'A', type: 'min7', role: 'Ⅱm7', ...getChordNotes('A', 'min7') },
-  { name: 'Bm7', root: 'B', type: 'min7', role: 'Ⅲm7', ...getChordNotes('B', 'min7') },
-  { name: 'Cmaj7', root: 'C', type: 'maj7', role: 'Ⅳmaj7', ...getChordNotes('C', 'maj7') },
-  { name: 'D7', root: 'D', type: '7', role: 'Ⅴ7', ...getChordNotes('D', '7') },
-  { name: 'Em7', root: 'E', type: 'min7', role: 'Ⅵm7', ...getChordNotes('E', 'min7') },
-  { name: 'F#m7♭5', root: 'F#', type: 'min7b5', role: 'Ⅶm7♭5', ...getChordNotes('F#', 'min7b5') },
-];
+// Generate chord name
+function getChordName(root: Note, type: ChordType): string {
+  const rootName = root;
+  const suffixes: Record<ChordType, string> = {
+    'major': '',
+    'minor': 'm',
+    'dim': 'm♭5',
+    'maj7': 'maj7',
+    'min7': 'm7',
+    '7': '7',
+    'min7b5': 'm7♭5',
+  };
+  return rootName + suffixes[type];
+}
 
-// トライアドとセブンスを分離
-export const TRIAD_CHORDS = CHORDS.slice(0, 7);
-export const SEVENTH_CHORDS = CHORDS.slice(7);
+// Get diatonic chords for a given key
+export function getDiatonicChords(key: Note): { triads: ChordDefinition[]; sevenths: ChordDefinition[] } {
+  const scale = getMajorScale(key);
 
-// フレット上の音を取得
+  const triads: ChordDefinition[] = scale.map((root, i) => ({
+    name: getChordName(root, DIATONIC_TRIAD_TYPES[i]),
+    root,
+    type: DIATONIC_TRIAD_TYPES[i],
+    role: DIATONIC_ROLES[i],
+    ...getChordNotes(root, DIATONIC_TRIAD_TYPES[i]),
+  }));
+
+  const sevenths: ChordDefinition[] = scale.map((root, i) => ({
+    name: getChordName(root, DIATONIC_SEVENTH_TYPES[i]),
+    root,
+    type: DIATONIC_SEVENTH_TYPES[i],
+    role: DIATONIC_SEVENTH_ROLES[i],
+    ...getChordNotes(root, DIATONIC_SEVENTH_TYPES[i]),
+  }));
+
+  return { triads, sevenths };
+}
+
+// Get note at fret
 export function getNoteAtFret(stringNote: Note, fret: number): Note {
   const noteIndex = NOTES.indexOf(stringNote);
   return NOTES[(noteIndex + fret) % 12];
 }
 
-// 音がスケールに含まれているか
-export function isInScale(note: Note): boolean {
-  return G_MAJOR_SCALE.includes(note);
+// Check if note is in scale
+export function isInScale(note: Note, key: Note): boolean {
+  const scale = getMajorScale(key);
+  return scale.includes(note);
 }
 
-// 音がブルーノートか
-export function isBlueNote(note: Note): boolean {
-  return BLUE_NOTES.includes(note);
+// Check if note is a blue note
+export function isBlueNote(note: Note, key: Note): boolean {
+  const blueNotes = getBlueNotes(key);
+  return blueNotes.includes(note);
 }
 
-// 音がコードトーンか
+// Check if note is a chord tone
 export function isChordTone(note: Note, chord: ChordDefinition): boolean {
   return chord.notes.includes(note);
 }
 
-// コードトーンの度数を取得（コードルートからの度数）
+// Get chord degree for a note
 export function getChordDegree(note: Note, chord: ChordDefinition): string | null {
   const index = chord.notes.indexOf(note);
   if (index === -1) return null;
   return chord.degrees[index];
 }
 
-// 構成音を表示用文字列に変換
+// Format notes for display
 export function formatNotes(notes: Note[]): string {
   return notes.map(note => {
-    // F#はそのまま、その他のシャープはフラット表記に
     if (note === 'F#') return 'F#';
     return FLAT_NOTES[note] || note;
   }).join('-');
 }
 
-// Gメジャースケールの構成音文字列
-export const G_MAJOR_SCALE_TEXT = 'G-A-B-C-D-E-F#';
-
-// ブルーノートを含むスケールの構成音文字列
-export const G_MAJOR_WITH_BLUE_TEXT = 'G-A-B♭-B-C-D♭-D-E-F-F#';
+// Get scale text for display
+export function getScaleText(key: Note): string {
+  const scale = getMajorScale(key);
+  return formatNotes(scale);
+}
